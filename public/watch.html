@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ดูหนังออนไลน์ - 25-HD</title>
+  <meta name="description" content="ดูหนังออนไลน์ฟรี HD พากย์ไทย ซับไทย เต็มเรื่อง" />
+  <link rel="icon" href="data:," />
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="watch-container">
+  <!-- Header -->
+  <header class="watch-header">
+    <div class="container">
+      <a href="index.html" class="back-link">
+        ← กลับหน้าหลัก
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="watch-main">
+    <div class="container">
+      <!-- Loading & Error States -->
+      <div id="loading" class="loading" style="display: none;">
+        <div class="spinner"></div>
+      </div>
+
+      <div id="error-message" class="error-message" style="display: none;"></div>
+
+      <div id="status" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+        กำลังเตรียมเล่นวิดีโอ...
+      </div>
+
+      <!-- Video Player -->
+      <div class="video-wrapper" id="videoWrapper" style="display: none;">
+        <div class="video-container" id="videoContainer">
+          <!-- YouTube iframe will be inserted here -->
+        </div>
+      </div>
+
+      <!-- Movie Details -->
+      <div class="movie-details" id="movieDetails" style="display: none;">
+        <div class="movie-info-main">
+          <h1 id="movieTitle">กำลังโหลด...</h1>
+          <p class="movie-description" id="movieDescription">
+            สนุกกับการรับชมหนังออนไลน์คุณภาพสูงจาก YouTube ผ่านระบบสตรีมมิ่งของเรา
+          </p>
+
+          <div class="movie-actions">
+            <a href="index.html" class="action-btn secondary">
+              ← กลับหน้าหลัก
+            </a>
+            <a href="#" class="action-btn" id="youtubeLink" target="_blank">
+              ดูใน YouTube
+            </a>
+          </div>
+        </div>
+
+        <div class="movie-info-sidebar">
+          <h3>ข้อมูลเพิ่มเติม</h3>
+          <div id="meta">
+            <p><strong>แพลตฟอร์ม:</strong> YouTube</p>
+            <p><strong>คุณภาพ:</strong> HD</p>
+            <p><strong>ภาษา:</strong> พากย์ไทย/ซับไทย</p>
+            <p><strong>ระบบ:</strong> สตรีมมิ่งออนไลน์</p>
+          </div>
+
+          <div
+            style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-card); border-radius: var(--radius-md); border: 1px solid var(--border-primary);">
+            <h4 style="margin-bottom: 0.5rem; color: var(--accent-primary);">💡 คำแนะนำ</h4>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">
+              • ใช้ Chrome หรือ Firefox เพื่อประสิทธิภาพที่ดีที่สุด<br>
+              • ตรวจสอบความเร็วอินเทอร์เน็ตของคุณ<br>
+              • ปิดโปรแกรมอื่นๆ ที่ใช้งานอินเทอร์เน็ต
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>25-HD</h3>
+          <p style="color: var(--text-secondary);">
+            ดูหนังออนไลน์ฟรี HD พากย์ไทย ซับไทย เต็มเรื่อง 2025
+          </p>
+        </div>
+
+        <div class="footer-section">
+          <h3>ลิงก์ด่วน</h3>
+          <ul class="footer-links">
+            <li><a href="index.html">หน้าแรก</a></li>
+            <li><a href="#movies">หนังใหม่</a></li>
+            <li><a href="#series">ซีรี่ส์</a></li>
+            <li><a href="admin.html">แอดมิน</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h3>ติดต่อ</h3>
+          <ul class="footer-links">
+            <li><a href="#contact">ติดต่อเรา</a></li>
+            <li><a href="#report">รายงานปัญหา</a></li>
+            <li><a href="#suggest">แนะนำหนัง</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2025 25-HD. ดูหนังออนไลน์ฟรี HD พากย์ไทย ซับไทย เต็มเรื่อง. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Watch page functionality
+    document.addEventListener('DOMContentLoaded', function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const videoId = urlParams.get('id');
+      const movieId = urlParams.get('movie');
+
+      if (videoId) {
+        loadVideo(videoId);
+      } else if (movieId) {
+        loadMovie(movieId);
+      } else {
+        showError('ไม่พบวิดีโอ');
+      }
+    });
+
+    function loadVideo(videoId) {
+      showLoading(true);
+      hideError();
+      hideStatus();
+
+      // Generate YouTube embed URL
+      const embedUrl = generateEmbedUrl(videoId);
+
+      // Create iframe
+      const iframe = document.createElement('iframe');
+      iframe.src = embedUrl;
+      iframe.frameBorder = '0';
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      iframe.allowFullscreen = true;
+      iframe.style.width = '100%';
+      iframe.style.height = '100%';
+      iframe.style.borderRadius = 'var(--radius-md)';
+
+      // Insert iframe
+      const videoContainer = document.getElementById('videoContainer');
+      videoContainer.innerHTML = '';
+      videoContainer.appendChild(iframe);
+
+      // Show video player
+      document.getElementById('videoWrapper').style.display = 'block';
+      document.getElementById('movieDetails').style.display = 'block';
+
+      // Set YouTube link
+      const youtubeLink = document.getElementById('youtubeLink');
+      youtubeLink.href = `https://www.youtube.com/watch?v=${videoId}`;
+
+      showLoading(false);
+    }
+
+    function loadMovie(movieId) {
+      showLoading(true);
+      hideError();
+      hideStatus();
+
+      // Fetch movie details from Firestore REST API
+      fetch(`https://firestore.googleapis.com/v1/projects/classic-e8ab7/databases/(default)/documents/movies/${movieId}`)
+        .then(response => {
+          if (!response.ok) throw new Error('Failed to load movie');
+          return response.json();
+        })
+        .then(data => {
+          const fields = data.fields || {};
+          const movie = {
+            title: fields.title?.stringValue || 'Untitled',
+            url: fields.url?.stringValue || fields.youtubeId?.stringValue || '',
+            desc: fields.desc?.stringValue || '',
+            quality: fields.quality?.stringValue || 'HD',
+            category: fields.category?.stringValue || '',
+            year: fields.year?.integerValue || null,
+            viewCount: fields.viewCount?.integerValue || 0,
+            poster: fields.poster?.stringValue || fields.thumbnail?.stringValue || '/placeholder.jpg'
+          };
+
+          // Load video
+          if (movie.url) {
+            loadVideo(movie.url);
+
+            // Update movie details
+            document.getElementById('movieTitle').textContent = movie.title;
+            document.getElementById('movieDescription').textContent = movie.desc || 'ไม่มีคำอธิบาย';
+            document.getElementById('viewCount').textContent = movie.viewCount;
+
+            // Update meta info
+            const meta = document.getElementById('meta');
+            meta.innerHTML = `
+              <p><strong>แพลตฟอร์ม:</strong> YouTube</p>
+              <p><strong>คุณภาพ:</strong> ${movie.quality}</p>
+              <p><strong>ภาษา:</strong> พากย์ไทย/ซับไทย</p>
+              <p><strong>ระบบ:</strong> สตรีมมิ่งออนไลน์</p>
+              <p><strong>ยอดวิว:</strong> <span id="viewCount">${movie.viewCount}</span> ครั้ง</p>
+              ${movie.category ? `<p><strong>หมวดหมู่:</strong> ${movie.category}</p>` : ''}
+              ${movie.year ? `<p><strong>ปี:</strong> ${movie.year}</p>` : ''}
+            `;
+
+            // Update YouTube link
+            const youtubeLink = document.getElementById('youtubeLink');
+            youtubeLink.href = `https://www.youtube.com/watch?v=${movie.url}`;
+          } else {
+            showError('ไม่พบลิงก์วิดีโอ');
+          }
+        })
+        .catch(error => {
+          console.error('Error loading movie:', error);
+          showError('ไม่สามารถโหลดหนังได้ กรุณาลองใหม่');
+        })
+        .finally(() => {
+          showLoading(false);
+        });
+    }
+
+    function generateEmbedUrl(videoId) {
+      const params = new URLSearchParams({
+        autoplay: 1,
+        rel: 0,
+        modestbranding: 1,
+        controls: 1,
+        disablekb: 0,
+        fs: 1,
+        cc_load_policy: 1,
+        cc_lang_pref: 'th',
+        hl: 'th'
+      });
+
+      return `https://www.youtube-nocookie.com/embed/${videoId}?${params.toString()}`;
+    }
+
+    function showLoading(show) {
+      const loading = document.getElementById('loading');
+      const status = document.getElementById('status');
+
+      if (loading) loading.style.display = show ? 'flex' : 'none';
+      if (status) status.style.display = show ? 'flex' : 'none';
+    }
+
+    function showError(message) {
+      const errorEl = document.getElementById('error-message');
+      if (errorEl) {
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+      }
+      showLoading(false);
+      hideStatus();
+    }
+
+    function hideError() {
+      const errorEl = document.getElementById('error-message');
+      if (errorEl) errorEl.style.display = 'none';
+    }
+
+    function hideStatus() {
+      const status = document.getElementById('status');
+      if (status) status.style.display = 'none';
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard - 25-HD</title>
+  <meta name="description" content="จัดการหนังออนไลน์ 25-HD" />
+  <link rel="icon" href="data:," />
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-top">
+        <a href="index.html" class="logo">
+          <div class="logo-icon">⚙️</div>
+          <span>25-HD Admin</span>
+        </a>
+
+        <nav>
+          <ul class="nav-menu">
+            <li><a href="#dashboard" class="nav-link active">แดชบอร์ด</a></li>
+            <li><a href="#movies" class="nav-link">จัดการหนัง</a></li>
+            <li><a href="#add-movie" class="nav-link">เพิ่มหนัง</a></li>
+            <li><a href="index.html" class="nav-link">ดูเว็บ</a></li>
+          </ul>
+        </nav>
+
+        <div class="admin-actions">
+          <span style="color: var(--text-secondary); margin-right: 1rem;">
+            👤 Admin
+          </span>
+          <a href="index.html" class="action-btn secondary">
+            ออกจากระบบ
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main style="padding: 2rem 0;">
+    <div class="container">
+      <!-- Loading & Error States -->
+      <div id="loading" class="loading" style="display: none;">
+        <div class="spinner"></div>
+      </div>
+
+      <div id="error-message" class="error-message" style="display: none;"></div>
+      <div id="success-message" class="success-message" style="display: none;"></div>
+
+      <!-- Dashboard Section -->
+      <section id="dashboard" class="admin-section">
+        <div class="section-header">
+          <h2 class="section-title">📊 แดชบอร์ด</h2>
+          <button class="action-btn" id="refreshDashboard">
+            🔄 รีเฟรช
+          </button>
+        </div>
+
+        <div class="admin-grid">
+          <div class="admin-card">
+            <h3>📚 จำนวนหนังทั้งหมด</h3>
+            <div class="metric" id="total-movies">-</div>
+          </div>
+
+          <div class="admin-card">
+            <h3>🎬 หนังใหม่วันนี้</h3>
+            <div class="metric" id="today-movies">-</div>
+          </div>
+
+          <div class="admin-card">
+            <h3>👥 ผู้ใช้ทั้งหมด</h3>
+            <div class="metric" id="total-users">-</div>
+          </div>
+
+          <div class="admin-card">
+            <h3>📈 ยอดวิวทั้งหมด</h3>
+            <div class="metric" id="total-views">-</div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="admin-card" style="grid-column: 1 / -1; margin-top: 1rem;">
+          <h3>📋 กิจกรรมล่าสุด</h3>
+          <div id="recent-activity">
+            <table>
+              <thead>
+                <tr>
+                  <th>เวลา</th>
+                  <th>กิจกรรม</th>
+                  <th>รายละเอียด</th>
+                  <th>ผู้ดำเนินการ</th>
+                </tr>
+              </thead>
+              <tbody id="activity-rows">
+                <tr>
+                  <td colspan="4" style="color: var(--text-muted);">กำลังโหลด...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Movies Management Section -->
+      <section id="movies" class="admin-section" style="display: none;">
+        <div class="section-header">
+          <h2 class="section-title">🎬 จัดการหนัง</h2>
+          <div style="display: flex; gap: 1rem;">
+            <div class="search-container" style="min-width: 250px;">
+              <input type="text" class="search-input" id="movieSearch" placeholder="ค้นหาหนัง..." />
+              <button class="search-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.35-4.35"></path>
+                </svg>
+              </button>
+            </div>
+            <button class="action-btn" onclick="showAddMovieForm()">
+              ➕ เพิ่มหนังใหม่
+            </button>
+          </div>
+        </div>
+
+        <div class="movies-grid" id="adminMoviesGrid">
+          <!-- Movies will be loaded here -->
+        </div>
+      </section>
+
+      <!-- Add/Edit Movie Section -->
+      <section id="add-movie" class="admin-section" style="display: none;">
+        <div class="section-header">
+          <h2 class="section-title">➕ เพิ่ม/แก้ไขหนัง</h2>
+        </div>
+
+        <div class="admin-card" style="max-width: 800px; margin: 0 auto;">
+          <form id="movieForm">
+            <input type="hidden" id="movieId" value="">
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+              <!-- Left Column -->
+              <div>
+                <div class="form-group">
+                  <label for="movieTitle">ชื่อหนัง *</label>
+                  <input type="text" class="form-control" id="movieTitle" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="movieYear">ปีที่ฉาย *</label>
+                  <input type="number" class="form-control" id="movieYear" min="1900" max="2030" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="movieCategory">หมวดหมู่ *</label>
+                  <select class="form-select" id="movieCategory" required>
+                    <option value="">เลือกหมวดหมู่</option>
+                    <option value="action">แอคชั่น</option>
+                    <option value="drama">ดราม่า</option>
+                    <option value="comedy">ตลก</option>
+                    <option value="horror">สยองขวัญ</option>
+                    <option value="sci-fi">ไซไฟ</option>
+                    <option value="thriller">ระทึกขวัญ</option>
+                    <option value="romance">โรแมนติก</option>
+                    <option value="crime">อาชญากรรม</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="movieQuality">คุณภาพ *</label>
+                  <select class="form-select" id="movieQuality" required>
+                    <option value="HD">HD</option>
+                    <option value="Full HD">Full HD</option>
+                    <option value="4K">4K</option>
+                    <option value="CAM">CAM</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Right Column -->
+              <div>
+                <div class="form-group">
+                  <label for="movieYoutubeId">YouTube ID *</label>
+                  <input type="text" class="form-control" id="movieYoutubeId" placeholder="เช่น vKQi3bBA1y8" required>
+                  <small style="color: var(--text-muted);">จาก URL:
+                    youtube.com/watch?v=<strong>YOUTUBE_ID</strong></small>
+                </div>
+
+                <div class="form-group">
+                  <label for="movieThumbnail">URL รูปภาพ</label>
+                  <input type="url" class="form-control" id="movieThumbnail"
+                    placeholder="https://i.ytimg.com/vi/YOUTUBE_ID/hqdefault.jpg">
+                  <small style="color: var(--text-muted);">ปล่อยว่างถ้าต้องการใช้รูปจาก YouTube</small>
+                </div>
+
+                <div class="form-group">
+                  <label for="movieDescription">คำอธิบาย</label>
+                  <textarea class="form-control" id="movieDescription" rows="4"
+                    placeholder="คำอธิบายหนัง..."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="action-btn secondary" onclick="cancelMovieForm()">
+                ยกเลิก
+              </button>
+              <button type="submit" class="action-btn">
+                <span id="submitBtnText">💾 บันทึกหนัง</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Edit/Delete Modal -->
+  <div id="movieModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle">จัดการหนัง</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="modalContent">
+          <!-- Content will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+
+</html>
